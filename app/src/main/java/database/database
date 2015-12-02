@@ -1,0 +1,176 @@
+package com.example.feuilledesheures;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Hashtable;
+import android.content.ContentValues;
+import android.content.Context;
+import android.database.Cursor;
+import android.database.DatabaseUtils;
+import android.database.sqlite.SQLiteOpenHelper;
+import android.database.sqlite.SQLiteDatabase;
+
+public class DBHelper extends SQLiteOpenHelper {
+
+   public static final String DATABASE_NAME = "FeuilleDesHeures.db";
+   public static final String EMPLOYEE_TABLE_NAME = "employee";
+   public static final String EMPLOYEE_COLUMN_ID = "id";
+   public static final String EMPLOYEE_COLUMN_NOM = "nom";
+   public static final String EMPLOYEE_COLUMN_EMAIL = "email";
+   public static final String EMPLOYEE_COLUMN_RUE = "rue";
+   public static final String EMPLOYEE_COLUMN_VILLE = "ville";
+   public static final String EMPLOYEE_COLUMN_TELEPHONE = "telephone";
+   public static final String EVENEMENT_TABLE_NAME = "evenement";
+   public static final String EVENEMENT_COLUMN_ID = "id";
+   public static final String EVENEMENT_COLUMN_IDEMPLOYEE = "idemployee";
+   public static final String EVENEMENT_COLUMN_HEURESCONTRAT = "nbheurescontrat";
+   public static final String EVENEMENT_COLUMN_HEURESSUP = "nbheuressup";
+   public static final String EVENEMENT_COLUMN_absence = "absenceheure";
+
+   private HashMap hp;
+
+   public DBHelper(Context context)
+   {
+      super(context, DATABASE_NAME , null, 1);
+   }
+
+   @Override
+   public void onCreate(SQLiteDatabase db) {
+      // TODO Auto-generated method stub
+      db.execSQL(
+      "create table employee " +
+      "(id integer primary key, nom text,telephone text,email text, rue text,ville text)"
+      );
+      db.execSQL(
+      "create table evenement " +
+      "(id integer, id integer, primary key, nbheurescontrat int,nbheuresup int,absenceheure int)"
+      );
+   }
+
+   @Override
+   public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+      // TODO Auto-generated method stub
+      db.execSQL("DROP TABLE IF EXISTS employee");
+      db.execSQL("DROP TABLE IF EXISTS evenement");
+      onCreate(db);
+   }
+
+   public boolean insertEmployee  (String nom, String telephone, String email, String rue,String ville)
+   {
+      SQLiteDatabase db = this.getWritableDatabase();
+      ContentValues contentValues = new ContentValues();
+      contentValues.put("nom", nom);
+      contentValues.put("telephone", telephone);
+      contentValues.put("email", email);
+      contentValues.put("rue", rue);
+      contentValues.put("ville", ville);
+      db.insert("employee", null, contentValues);
+      return true;
+   }
+
+   public boolean insertEvenement  (Int id, Int nbheurescontrat, Int nbheuresup, int absenceheure)
+   {
+      SQLiteDatabase db = this.getWritableDatabase();
+      ContentValues contentValues = new ContentValues();
+      contentValues.put("id", id);
+      contentValues.put("idemployee", idemployee);
+      contentValues.put("nbheurescontrat", nbheurescontrat);
+      contentValues.put("nbheuresup", nbheuresup);
+      contentValues.put("absenceheure", absenceheure);
+      db.insert("evenement", null, contentValues);
+      return true;
+   }
+
+   public Cursor getData(int id){
+      SQLiteDatabase db = this.getReadableDatabase();
+      Cursor res =  db.rawQuery( "select * from employee,evenement where id="+id+"", null );
+      return res;
+   }
+
+   public int numberOfRows(){
+      SQLiteDatabase db = this.getReadableDatabase();
+      int numRows = (int) DatabaseUtils.queryNumEntries(db, EMPLOYEE_TABLE_NOM);
+      return numRows;
+   }
+
+   public int numberOfRows(){
+      SQLiteDatabase db = this.getReadableDatabase();
+      int numRows = (int) DatabaseUtils.queryNumEntries(db, EVENEMENT_TABLE_NOM);
+      return numRows;
+   }
+
+   public boolean updateEmployee (Integer id, String nom, String telephone, String email, String rue,String ville)
+   {
+      SQLiteDatabase db = this.getWritableDatabase();
+      ContentValues contentValues = new ContentValues();
+      contentValues.put("nom", nom);
+      contentValues.put("telephone", telephone);
+      contentValues.put("email", email);
+      contentValues.put("rue", rue);
+      contentValues.put("ville", ville);
+      db.update("employee", contentValues, "id = ? ", new String[] { Integer.toString(id) } );
+      return true;
+   }
+
+
+    public boolean updateEvenement (Integer id, Integer idemployee, Integer nbheurescontrat, Integer nbheuresup, Integer absenceheure)
+   {
+      SQLiteDatabase db = this.getWritableDatabase();
+      ContentValues contentValues = new ContentValues();
+      contentValues.put("idemployee", idemployee);
+      contentValues.put("nbheurescontrat", nbheurescontrat);
+      contentValues.put("nbheuresup", nbheuresup);
+      contentValues.put("absenceheure", absenceheure);
+      db.update("evenement", contentValues, "id = ? ", new String[] { Integer.toString(id) } );
+      return true;
+   }
+
+   public Integer deleteEmployee (Integer id)
+   {
+      SQLiteDatabase db = this.getWritableDatabase();
+      return db.delete("employee",
+      "id = ? ",
+      new String[] { Integer.toString(id) });
+   }
+
+   public Integer deleteEvenement (Integer id)
+   {
+      SQLiteDatabase db = this.getWritableDatabase();
+      return db.delete("evenement",
+      "id = ? ",
+      new String[] { Integer.toString(id) });
+   }
+
+   public ArrayList<String> getAllEmployee()
+   {
+      ArrayList<String> array_list = new ArrayList<String>();
+
+      //hp = new HashMap();
+      SQLiteDatabase db = this.getReadableDatabase();
+      Cursor res =  db.rawQuery( "select * from employee", null );
+      res.moveToFirst();
+
+      while(res.isAfterLast() == false){
+         array_list.add(res.getString(res.getColumnIndex(EMPLOYEE_COLUMN_NOM)));
+         res.moveToNext();
+      }
+   return array_list;
+   }
+
+
+   public ArrayList<String> getAllEvenement()
+   {
+      ArrayList<String> array_list = new ArrayList<String>();
+
+      //hp = new HashMap();
+      SQLiteDatabase db = this.getReadableDatabase();
+      Cursor res =  db.rawQuery( "select * from evenement", null );
+      res.moveToFirst();
+
+      while(res.isAfterLast() == false){
+         array_list.add(res.getString(res.getColumnIndex(EVENEMENT_COLUMN_NOM)));
+         res.moveToNext();
+      }
+   return array_list;
+   }
+}
